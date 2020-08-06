@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="https://vignette.wikia.nocookie.net/logocreation/images/5/5b/Paint_Windows_7.png/revision/latest/scale-to-width-down/340?cb=20100719145047&path-prefix=es" type="image/x-icon">
+  <title>Pain</title>
+</head>
+<body>
+  <h4>For Socket.io use "test" event and a message, for HTTP use "GET /request?msg=" and add a message (message without quotes)</h4>
+  <button onclick="testSocket()">Test socket</button>
+  <form action="/request" method="get">
+    <button type="submit">Test request</button>
+  </form>
+  <p>Messages:</p>
+  <ul id="main">
+    
+  </ul>
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io()
+
+  document.forms[0].addEventListener("click", (e) => {
+    e.preventDefault()
+    let xhttp = new XMLHttpRequest()
+    xhttp.open("GET", "/request?msg=HTTP works!", true)
+    xhttp.send()
+  } )
+
+  socket.on('receive', (arr) => {
+    let li = document.createElement("li")
+    li.appendChild(document.createTextNode(arr[0] + " - Socket.io - " + arr[1]))
+    document.getElementById('main').appendChild(li)
+  })
+
+  socket.on('request', (arrs) => {
+    let li = document.createElement("li")
+    li.appendChild(document.createTextNode(arrs[0] + " - HTTP - " + arrs[1]))
+    document.getElementById('main').appendChild(li)
+  })
+
+  function testSocket() {
+    socket.emit('test', 'Socket works!')
+  }
+</script>
+</body>
+</html>
