@@ -2,14 +2,13 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const path = require('path');
-const classStatus = require('./models/arduinoSensors');
+const arduinosens = require('./models/arduinoSensors');
 const mongoose = require('mongoose');
 var url = 'mongodb+srv://admin:admin@azielongas-rztzj.mongodb.net/PArduino?retryWrites=true&w=majority';
 app.use(require('express').static(__dirname + '../node_modules/socket.io-client/dist'));
 
 app.use(morgan('dev'));
 app.use(require('express').urlencoded({ extended: true }))
-
 app.set('port', process.env.PORT || 3000);
 
 mongoose.connect(url)
@@ -17,7 +16,7 @@ mongoose.connect(url)
   .catch(db => console.log('No Conectado'));
 
 
-app.get('/',  (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, "views/index.html"))
   // console.log(`Temperature:  ${req.body.temp}`);
   //console.log(`Humidity: ${req.body.hum}`);
@@ -50,32 +49,32 @@ io.on('connection', (socket) => {
     socket.emit('initialData', classroomData[id])
     socket.join(id)
   });
-  socket.on('arduinoUpdate',async ({ arduinoUpdate }) => {
+  socket.on('arduinoUpdate', async ({ arduinoUpdate }) => {
+    const datos = await arduinosens.findOne({ id: '1' });
     var searchParams = new URLSearchParams(arduinoUpdate);
-    for (let d of searchParams) {
-      switch(d){
-       case ('temp' <= 20):
-       await arduinosens.updateOne({ id: '1' }, { ac: false }); 
-        case ('temp' > 20):
-       await arduinosens.updateOne({ id: '1' }, { ac: true }); 
-        case ('dstnc'<= 5):
-        await arduinosens.updateOne({ id: '1' }, { door: false});
-        case ('dstnc'> 5):
-        await arduinosens.updateOne({ id: '1' }, { door: true}, function (err, docs) { 
-            if (err){ 
-                console.log(err); 
-            } 
-            else{ 
-               console.log(docs);            
-            }
-          });         
-        case ('light'<= 400):
-        await arduinosens.updateOne({ id: '1' }, { light: false});
-        case ('light' > 400):
-        await  arduinosens.updateOne({ id: '1' }, { light: true});        
+    for (let [key, value] of searchParams) {
+      console.log(key, value);
+      switch (key) {
+        case "temp":
+          if (parseFloat(value) <= 20) 
+          { await arduinosens.updateOne({ id: '1' }, { $set: { ac: false } }); }
+          else 
+          { await arduinosens.updateOne({ id: '1' }, { $set: { ac: true } }); }
+        case "dstnc":
+          if (parseFloat(value) <= 5) 
+          { await arduinosens.updateOne({ id: '1' }, { $set: { door: true } }); }
+          else 
+          { await arduinosens.updateOne({ id: '1' }, { $set: { door: false } }); }
+        case "light":
+          if (parseFloat(value) <= 400) 
+          {await arduinosens.updateOne({ id: '1' }, { $set: { light: true } });}
+          else
+          { await arduinosens.updateOne({ id: '1' }, { $set: { light: false } }); }
+        default:
+          console.log("no sube");
       }
-      console.log(d);
-      //socket.to(id).emit("updateData", classroomData[id])
+        //socket.to(id).emit("updateData", classroomData[id])
     }
   });
-}); 
+});
+
