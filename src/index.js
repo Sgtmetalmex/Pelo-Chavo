@@ -15,11 +15,8 @@ mongoose.connect(url)
   .then(db => console.log('Conectado'))
   .catch(db => console.log('No Conectado'));
 
-
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, "views/index.html"))
-  // console.log(`Temperature:  ${req.body.temp}`);
-  //console.log(`Humidity: ${req.body.hum}`);
 });
 
 const server = app.listen(app.get('port'), () => {
@@ -28,24 +25,10 @@ const server = app.listen(app.get('port'), () => {
 
 var io = require('socket.io')(server);
 
-// app.post('/', async  (req, res) =>{
-
-//  console.log(`Temperature:  ${req.body.temp}`);
-//    console.log(`Humidity: ${req.body.hum}`);
-
-// await arduinosens.updateOne({id:'1'}, {temp: req.body.temp, hum: req.body.hum}, function (err, docs) { 
-//   if (err){ 
-//      console.log(err); 
-//  } 
-//  else{ 
-//     console.log(docs);            
-// } 
-//  }); 
-//  });
-
 io.on('connection', (socket) => {
   console.log("Socket connected");
   socket.on('roomData', (id) => {
+    var classroomData = arduinosens.find();
     socket.emit('initialData', classroomData[id])
     socket.join(id)
   });
@@ -56,24 +39,27 @@ io.on('connection', (socket) => {
       console.log(key, value);
       switch (key) {
         case "temp":
-          if (parseFloat(value) <= 20) 
-          { await arduinosens.updateOne({ id: '1' }, { $set: { ac: false } }); }
+          if (parseFloat(value) <= 20)//If temp is less than 20 we send a false cuz the temperature is not the normal temperature in Chihuahua(too cold)(red COlor)   
+          { await arduinosens.updateOne({id: '1'}, { $set: {ac: false}});}
           else 
-          { await arduinosens.updateOne({ id: '1' }, { $set: { ac: true } }); }
+          { await arduinosens.updateOne({id: '1'}, { $set: {ac: true}});}
         case "dstnc":
-          if (parseFloat(value) <= 5) 
-          { await arduinosens.updateOne({ id: '1' }, { $set: { door: true } }); }
+          if (parseFloat(value) <= 5)//If dstnc is less than 5 we send a true cuz the windows are closed(Green color) 
+          { await arduinosens.updateOne({id: '1'}, { $set: {window: true}});}
           else 
-          { await arduinosens.updateOne({ id: '1' }, { $set: { door: false } }); }
+          { await arduinosens.updateOne({id: '1'}, { $set: {window: false}});}
         case "light":
-          if (parseFloat(value) <= 400) 
-          {await arduinosens.updateOne({ id: '1' }, { $set: { light: true } });}
+          if (parseFloat(value) <= 400)//if light is less than 400 it is enviromental light and its ok so we send a true(Green Color) 
+          {await arduinosens.updateOne({id: '1'}, { $set: {light: true }});}
           else
-          { await arduinosens.updateOne({ id: '1' }, { $set: { light: false } }); }
-        default:
-          console.log("no sube");
+          { await arduinosens.updateOne({id: '1'}, { $set: {light: false }});}
+        case "Wifi":
+          if (parseInt(value) === 1)//If Wifi is on the, proyector is On too so we send a false(Red Color)
+          {await arduinosens.updateOne({id: '1'},{$set: {wifi: false}});}
+          else
+          {await arduinosens.updateOne({id: '1'},{$set: {wifi: true}});} 
       }
-        //socket.to(id).emit("updateData", classroomData[id])
+        //socket.to(id).emit("updateData", classroomData[id]);
     }
   });
 });
