@@ -37,7 +37,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('arduinoUpdate', async ({ arduinoUpdate }) => {
-    console.log(arduinoUpdate)
     let searchParams = new URLSearchParams(arduinoUpdate);
     let classroomId = searchParams.get("id")
     
@@ -49,7 +48,6 @@ io.on('connection', (socket) => {
       let currentIndex = classroomData[classroomId].length
       classroomData[classroomId][currentIndex] = {}
       let boolValue = null
-      console.log(key, value);
       switch (key) {
         case "AC":
         boolValue = parseFloat(value) <= 20
@@ -64,6 +62,7 @@ io.on('connection', (socket) => {
       classroomData[classroomId][currentIndex].status = boolValue
       await arduinosens.updateOne({id: classroomId},{$set:{[key]:boolValue}})
     }
+    console.log(classroomData)
     socket.to(classroomId).emit("updateData", classroomData[classroomId]);
   });
 });
