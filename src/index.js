@@ -30,12 +30,12 @@ var classroomData = {}
 
 io.on('connection', (socket) => {
   console.log("Socket connected");
-
+  
   socket.on('roomData', (id) => {
     socket.emit('initialData', classroomData[id])
     socket.join(id)
   });
-
+  
   socket.on('arduinoUpdate', async ({ arduinoUpdate }) => {
     let searchParams = new URLSearchParams(arduinoUpdate);
     let classroomId = searchParams.get("id")
@@ -44,24 +44,26 @@ io.on('connection', (socket) => {
       classroomData[classroomId] = []
     }
     
+    let currentIndex = 0
     for (const [key, value] of searchParams) {
-      let currentIndex = classroomData[classroomId].length
       console.log(currentIndex)
-      classroomData[classroomId][currentIndex] = {}
-      let boolValue = null
-      switch (key) {
-        case "AC":
-        boolValue = parseFloat(value) <= 20
-        case "Windows":
-        boolValue = parseFloat(value) <= 5
-        case "Lights":
-        boolValue = parseFloat(value) <= 400
-        case "Projector":
-        boolValue = parseFloat(value) === 1
+      if (currentIndex !== 0) {
+        classroomData[classroomId][currentIndex] = {}
+        let boolValue = null
+        switch (key) {
+          case "AC":
+          boolValue = parseFloat(value) <= 20
+          case "Windows":
+          boolValue = parseFloat(value) <= 5
+          case "Lights":
+          boolValue = parseFloat(value) <= 400
+          case "Projector":
+          boolValue = parseFloat(value) === 1
+        }
+        classroomData[classroomId][currentIndex].name = key
+        classroomData[classroomId][currentIndex].status = boolValue
+        await arduinosens.updateOne({id: classroomId},{$set:{[key]:boolValue}})
       }
-      classroomData[classroomId][currentIndex].name = key
-      classroomData[classroomId][currentIndex].status = boolValue
-      await arduinosens.updateOne({id: classroomId},{$set:{[key]:boolValue}})
     }
     socket.to(classroomId).emit("updateData", classroomData[classroomId]);
   });
