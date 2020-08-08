@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
       classroomData[classroomId] = []
     }
     
-    let currentIndex = 0
+    let currentIndex = -1
     for (const [key, value] of searchParams) {
       if (currentIndex !== 0) {
         classroomData[classroomId][currentIndex] = {}
