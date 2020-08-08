@@ -62,8 +62,8 @@ io.on('connection', (socket) => {
         classroomData[classroomId][currentIndex].name = key
         classroomData[classroomId][currentIndex].status = boolValue
         await arduinosens.updateOne({id: classroomId},{$set:{[key]:boolValue}})
-        ++currentIndex
       }
+      ++currentIndex
     }
     console.log(classroomData)
     socket.to(classroomId).emit("updateData", classroomData[classroomId]);
