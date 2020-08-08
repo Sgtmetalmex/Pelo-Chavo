@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
     
     let currentIndex = -1
     for (const [key, value] of searchParams) {
-      if (currentIndex !== 0) {
+      if (currentIndex !== -1) {
         classroomData[classroomId][currentIndex] = {}
         let boolValue = null
         switch (key) {
