@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('arduinoUpdate', async ({ arduinoUpdate }) => {
+    console.log(arduinoUpdate)
     let searchParams = new URLSearchParams(arduinoUpdate);
     let classroomId = searchParams.get("id")
     
