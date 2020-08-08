@@ -52,12 +52,44 @@ io.on('connection', (socket) => {
         switch (key) {
           case "AC":
           boolValue = parseFloat(value) <= 20
+          classroomData[classroomId][currentIndex].true = {
+            description: "AC off",
+            iconId: "cmd_air_conditioner"
+          }
+          classroomData[classroomId][currentIndex].false = {
+            iconId: "cmd_air_conditioner",
+            description: "AC on"
+          }
           case "Windows":
           boolValue = parseFloat(value) <= 5
+          classroomData[classroomId][currentIndex].true = {
+            iconId: "cmd_window_closed_variant",
+            description: "All windows closed"
+          }
+          classroomData[classroomId][currentIndex].false = {
+            iconId: "cmd_window_open_variant",
+            description: "One or more windows open"
+          }
           case "Lights":
           boolValue = parseFloat(value) <= 400
+          classroomData[classroomId][currentIndex].true = {
+            iconId: "cmd_lightbulb_outline",
+            description: "All lights off"
+          }
+          classroomData[classroomId][currentIndex].false = {
+            iconId: "cmd_lightbulb_on",
+            description: "One or more lights off"
+          }
           case "Projector":
           boolValue = parseFloat(value) === 1
+          classroomData[classroomId][currentIndex].true = {
+            iconId: "cmd_projector",
+            description: "Projector off"
+          }
+          classroomData[classroomId][currentIndex].false = {
+            iconId: "cmd_projector",
+            description: "Projector on"
+          }
         }
         classroomData[classroomId][currentIndex].name = key
         classroomData[classroomId][currentIndex].status = boolValue
