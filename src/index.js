@@ -46,6 +46,7 @@ io.on('connection', (socket) => {
     
     for (const [key, value] of searchParams) {
       let currentIndex = classroomData[classroomId].length
+      console.log(currentIndex)
       classroomData[classroomId][currentIndex] = {}
       let boolValue = null
       switch (key) {
@@ -62,7 +63,6 @@ io.on('connection', (socket) => {
       classroomData[classroomId][currentIndex].status = boolValue
       await arduinosens.updateOne({id: classroomId},{$set:{[key]:boolValue}})
     }
-    console.log(classroomData)
     socket.to(classroomId).emit("updateData", classroomData[classroomId]);
   });
 });
