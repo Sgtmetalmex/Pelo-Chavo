@@ -53,12 +53,12 @@ io.on('connection', (socket) => {
           case "AC":
           boolValue = parseFloat(value) <= 20
           classroomData[classroomId][currentIndex].true = {
-            description: "AC off",
+            description: "AC on",
             iconId: "cmd_air_conditioner"
           }
           classroomData[classroomId][currentIndex].false = {
             iconId: "cmd_air_conditioner",
-            description: "AC on"
+            description: "AC off"
           }
           case "Windows":
           boolValue = parseFloat(value) <= 5
